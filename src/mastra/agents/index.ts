@@ -32,4 +32,4 @@ export const weatherAgent = new Agent({
 
 export { slideCreatorAgent } from './slideCreatorAgent';
 export { imageCreatorAgent } from './imageCreatorAgent';
-export * from './open-superagent';
+export * from './open-hub-ai';

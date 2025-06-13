@@ -52,7 +52,7 @@ mastra dev
 
 ### Core Agent System
 The application uses Mastra's agent framework with three main agents:
-1. **slideCreatorAgent (Open-SuperAgent)**: The primary agent with access to all tools
+1. **slideCreatorAgent (OPEN HUB AI)**: The primary agent with access to all tools
 2. **imageCreatorAgent**: Specialized for image generation tasks
 3. **weatherAgent**: Basic weather information agent
 

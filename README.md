@@ -1,4 +1,4 @@
-# Open-SuperAgent
+# OPEN HUB AI
 
 AIアシスタント機能を備えたオープンソースチャットアプリケーション。Mastraエージェントと連携して、様々なタスクを自動化します。
 
@@ -188,7 +188,7 @@ mastra build
 
 このプロジェクトは**二層ライセンス構造**を採用しています：
 
-### 1. Open-SuperAgent独自コード
+### 1. OPEN HUB AI独自コード
 - **ライセンス**: MIT License with Commercial Use Restrictions
 - **商用利用**: AI Freak SummitまたはAIで遊ぼうコミュニティのメンバーのみ可能
 - **個人利用**: 誰でも可能（非商用・教育目的）
@@ -207,7 +207,7 @@ mastra build
 - 自社製品への組み込み（コミュニティメンバーの場合）
 
 ### 禁止されているケース ❌
-- Open-SuperAgentをWebサービスとしてホスティングし、他者に提供
+- OPEN HUB AIをWebサービスとしてホスティングし、他者に提供
 - Mastraのライセンス表示を削除しての再配布
 - コミュニティ非メンバーによる商用利用
 

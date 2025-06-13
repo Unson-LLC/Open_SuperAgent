@@ -8,8 +8,8 @@ import {
 } from '../tools';
 import { Memory } from '@mastra/memory';
 
-export const openSuperagent = new Agent({
-  name: 'Open Super Agent',
+export const openHubAI = new Agent({
+  name: 'OPEN HUB AI',
   instructions: `You are a helpful assistant with access to a variety of tools.
 Use the available tools to best respond to the user's requests.
 Available tools:

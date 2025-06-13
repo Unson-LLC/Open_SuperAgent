@@ -29,12 +29,10 @@ export const browserObserveTool = createTool({
         throw new Error(`No active browser session found for sessionId: ${sessionId}. Please use browser-goto tool first.`);
       }
       
-      const page = stagehand.page;
-      
       console.log(`👁️ Observing: ${instruction}`);
       
       // Stagehandの観察機能
-      const suggestions = await page.observe(instruction);
+      const suggestions = await stagehand.observe(instruction);
       
       console.log(`✅ Observation completed, found ${suggestions.length} suggestions`);
       

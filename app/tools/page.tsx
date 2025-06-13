@@ -222,7 +222,7 @@ export default function ToolsPage() {
                   AIツール一覧
                 </h1>
                 <p className="text-xl text-muted-foreground">
-                  Open-SuperAgent
+                  OPEN HUB AI
                 </p>
                 </div>
               <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
@@ -413,7 +413,7 @@ export default function ToolsPage() {
                 <div className="text-center space-y-6">
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold text-foreground">
-                      Open-SuperAgent の特徴
+                      OPEN HUB AI の特徴
                     </h3>
                     <p className="text-muted-foreground">
                       多様なAIツールを統合し、クリエイティブなワークフローを効率化

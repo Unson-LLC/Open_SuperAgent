@@ -1315,6 +1315,159 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onPreviewOpen
   };
 
   // マークダウンのリンクをBadge形式で表示する関数
+  // カスタムマークダウンパーサー
+  const parseMarkdown = (text: string): ReactNode[] => {
+    const elements: ReactNode[] = [];
+    let key = 0;
+
+    // コードブロックの処理
+    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = codeBlockRegex.exec(text)) !== null) {
+      // コードブロック前のテキストを処理
+      if (match.index > lastIndex) {
+        elements.push(...parseInlineMarkdown(text.slice(lastIndex, match.index), key));
+        key += 100;
+      }
+
+      // コードブロック
+      const language = match[1] || '';
+      const code = match[2].trim();
+      elements.push(
+        <pre key={`code-block-${key++}`} className="bg-gray-100 rounded-md p-4 my-2 overflow-x-auto">
+          <code className={`language-${language}`}>{code}</code>
+        </pre>
+      );
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // 残りのテキストを処理
+    if (lastIndex < text.length) {
+      elements.push(...parseInlineMarkdown(text.slice(lastIndex), key));
+    }
+
+    return elements.length > 0 ? elements : [text];
+  };
+
+  // インラインマークダウンの処理
+  const parseInlineMarkdown = (text: string, baseKey: number): ReactNode[] => {
+    const elements: ReactNode[] = [];
+    let currentText = text;
+    let key = baseKey;
+
+    // インラインコードの処理
+    currentText = currentText.replace(/`([^`]+)`/g, (_, code) => {
+      const placeholder = `__CODE_${key}__`;
+      elements.push(
+        <code key={`inline-code-${key++}`} className="bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono">
+          {code}
+        </code>
+      );
+      return placeholder;
+    });
+
+    // 太字の処理
+    currentText = currentText.replace(/\*\*([^*]+)\*\*/g, (_, bold) => {
+      const placeholder = `__BOLD_${key}__`;
+      elements.push(
+        <strong key={`bold-${key++}`} className="font-bold">
+          {bold}
+        </strong>
+      );
+      return placeholder;
+    });
+
+    // イタリックの処理
+    currentText = currentText.replace(/\*([^*]+)\*/g, (_, italic) => {
+      const placeholder = `__ITALIC_${key}__`;
+      elements.push(
+        <em key={`italic-${key++}`} className="italic">
+          {italic}
+        </em>
+      );
+      return placeholder;
+    });
+
+    // リストの処理
+    const lines = currentText.split('\n');
+    const processedLines: ReactNode[] = [];
+    let inList = false;
+    let listItems: ReactNode[] = [];
+
+    lines.forEach((line, index) => {
+      const bulletMatch = line.match(/^[*\-+]\s+(.+)$/);
+      const numberedMatch = line.match(/^(\d+)\.\s+(.+)$/);
+
+      if (bulletMatch) {
+        if (!inList) {
+          inList = true;
+          listItems = [];
+        }
+        listItems.push(
+          <li key={`list-item-${key++}`}>{parseInlineElements(bulletMatch[1], key)}</li>
+        );
+      } else if (numberedMatch) {
+        if (!inList) {
+          inList = true;
+          listItems = [];
+        }
+        listItems.push(
+          <li key={`list-item-${key++}`}>{parseInlineElements(numberedMatch[2], key)}</li>
+        );
+      } else {
+        if (inList) {
+          processedLines.push(
+            <ul key={`list-${key++}`} className="list-disc list-inside my-2">
+              {listItems}
+            </ul>
+          );
+          inList = false;
+          listItems = [];
+        }
+        if (line.trim()) {
+          processedLines.push(
+            <span key={`line-${key++}`}>{parseInlineElements(line, key)}</span>
+          );
+        }
+      }
+    });
+
+    if (inList && listItems.length > 0) {
+      processedLines.push(
+        <ul key={`list-${key++}`} className="list-disc list-inside my-2">
+          {listItems}
+        </ul>
+      );
+    }
+
+    return processedLines.length > 0 ? processedLines : [currentText];
+  };
+
+  // インライン要素の処理
+  const parseInlineElements = (text: string, baseKey: number): ReactNode => {
+    // プレースホルダーを実際の要素に置き換える
+    const parts: ReactNode[] = [];
+    let lastIndex = 0;
+    const placeholderRegex = /__(\w+)_(\d+)__/g;
+    let match;
+
+    while ((match = placeholderRegex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+
+    return parts.length > 1 ? <>{parts}</> : (parts[0] || text);
+  };
+
   const renderMarkdownWithBadges = (text: string): ReactNode[] => {
     // まずメディア要素を処理
     const mediaProcessed = renderMarkdownMedia(text);
@@ -1324,78 +1477,75 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onPreviewOpen
       return mediaProcessed;
     }
     
-    // テキストのみの場合、リンクをBadgeに変換
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    const parts: ReactNode[] = [];
-    let lastIndex = 0;
-    let match;
-    
     const processedText = typeof mediaProcessed[0] === 'string' ? mediaProcessed[0] : text;
     
-    while ((match = linkRegex.exec(processedText)) !== null) {
-      const [fullMatch, linkText, url] = match;
-      
-      // リンクの前のテキスト部分を追加
-      if (match.index > lastIndex) {
-        const beforeText = processedText.slice(lastIndex, match.index);
-        if (beforeText) {
-          parts.push(
-            <span key={`text-${lastIndex}`}>{beforeText}</span>
-          );
+    // マークダウンをパース
+    const markdownElements = parseMarkdown(processedText);
+    
+    // リンクをBadgeに変換
+    const finalElements: ReactNode[] = [];
+    markdownElements.forEach((element, index) => {
+      if (typeof element === 'string') {
+        const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+        const parts: ReactNode[] = [];
+        let lastIndex = 0;
+        let match;
+        
+        while ((match = linkRegex.exec(element)) !== null) {
+          const [fullMatch, linkText, url] = match;
+          
+          if (match.index > lastIndex) {
+            parts.push(element.slice(lastIndex, match.index));
+          }
+          
+          const isMediaUrl = /\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|ogg|mov|avi|mp3|wav|m4a|aac|flac)(\?|$)/i.test(url) ||
+                            url.includes('/generated-');
+          
+          if (!isMediaUrl) {
+            parts.push(
+              <a
+                key={`badge-${index}-${match.index}`}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 mx-1 px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200 rounded-md hover:bg-blue-200 hover:text-blue-800 transition-colors no-underline"
+                style={{
+                  textDecoration: 'none',
+                  verticalAlign: 'middle',
+                }}
+              >
+                <ExternalLink className="h-3 w-3 shrink-0" />
+                <span className="truncate" style={{ maxWidth: '200px' }}>{linkText}</span>
+              </a>
+            );
+          } else {
+            parts.push(
+              <a
+                key={`link-${index}-${match.index}`}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 underline"
+              >
+                {linkText}
+              </a>
+            );
+          }
+          
+          lastIndex = match.index + fullMatch.length;
         }
-      }
-      
-      // URLがメディアファイルでない場合のみBadgeとして表示
-      const isMediaUrl = /\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|ogg|mov|avi|mp3|wav|m4a|aac|flac)(\?|$)/i.test(url) ||
-                        url.includes('/generated-');
-      
-      if (!isMediaUrl) {
-        // Badge形式でリンクを表示 - シンプルなインライン要素として
-        parts.push(
-          <a
-            key={`badge-${match.index}`}
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 mx-1 px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200 rounded-md hover:bg-blue-200 hover:text-blue-800 transition-colors no-underline"
-            style={{
-              textDecoration: 'none',
-              verticalAlign: 'middle',
-            }}
-          >
-            <ExternalLink className="h-3 w-3 shrink-0" />
-            <span className="truncate" style={{ maxWidth: '200px' }}>{linkText}</span>
-          </a>
-        );
+        
+        if (lastIndex < element.length) {
+          parts.push(element.slice(lastIndex));
+        }
+        
+        finalElements.push(...parts);
       } else {
-        // メディアURLの場合は通常のリンクとして表示
-        parts.push(
-          <a
-            key={`link-${match.index}`}
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800 underline"
-          >
-            {linkText}
-          </a>
-        );
+        finalElements.push(element);
       }
-      
-      lastIndex = match.index + fullMatch.length;
-    }
+    });
     
-    // 残りのテキスト部分を追加
-    if (lastIndex < processedText.length) {
-      const remainingText = processedText.slice(lastIndex);
-      if (remainingText) {
-        parts.push(
-          <span key={`text-${lastIndex}`}>{remainingText}</span>
-        );
-      }
-    }
-    
-    return parts.length > 0 ? parts : [processedText];
+    return finalElements.length > 0 ? finalElements : [processedText];
   };
 
   // HTML文字列から純粋なテキストのみを抽出する関数

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Open-SuperAgent",
-  description: "Open-SuperAgent - An open-source AI assistant",
+  title: "OPEN HUB AI",
+  description: "OPEN HUB AI - An open-source AI assistant",
 };
 
 export default function RootLayout({

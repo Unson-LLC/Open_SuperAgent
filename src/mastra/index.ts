@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { Mastra } from '@mastra/core';
-import { createLogger } from '@mastra/core/logger';
+import { ConsoleLogger } from '@mastra/core/logger';
 import { LibSQLStore } from '@mastra/libsql';
 import { weatherAgent, slideCreatorAgent, imageCreatorAgent } from './agents';
 import { 
@@ -44,7 +44,7 @@ export const mastra = new Mastra({
   storage: new LibSQLStore({
     url: "file:../memory.db",
   }),
-  logger: createLogger({
+  logger: new ConsoleLogger({
     name: 'Mastra',
     level: 'info',
   }),

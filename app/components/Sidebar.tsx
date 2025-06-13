@@ -7,7 +7,7 @@ export const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const menuItems = [
-    { name: 'OpenSuperAgent', href: '#', icon: BotMessageSquare, current: true },
+    { name: 'OPEN HUB AI', href: '#', icon: BotMessageSquare, current: true },
   ];
 
   const bottomMenuItems = [

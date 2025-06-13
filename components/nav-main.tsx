@@ -26,7 +26,7 @@ export function NavMain({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Open-SuperAgent</SidebarGroupLabel>
+      <SidebarGroupLabel>OPEN HUB AI</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           const isActive = pathname === item.url

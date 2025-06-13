@@ -62,14 +62,9 @@ export const braveSearchTool = createTool({
     const endpoint = 'https://api.search.brave.com/res/v1/web/search';
     
     // 日本語クエリに対応するため、適切にエンコード
-    // 422エラー対策: 日本語を含むクエリの場合、追加のパラメータを設定
     const params = new URLSearchParams({ 
       q: query,
       count: String(count),
-      // 日本語検索のための追加パラメータ
-      country: 'jp',  // 日本からの検索として扱う
-      lang: 'ja',     // 日本語の結果を優先
-      safesearch: 'moderate'  // セーフサーチを中程度に設定
     });
 
     // レート制限対策: リトライロジックを追加
@@ -99,7 +94,9 @@ export const braveSearchTool = createTool({
         }
 
         if (!resp.ok) {
-          throw new Error(`Brave Search API error: ${resp.status} ${resp.statusText}`);
+          const errorText = await resp.text();
+          console.error(`Brave Search API error details: ${errorText}`);
+          throw new Error(`Brave Search API error: ${resp.status} ${resp.statusText} - ${errorText}`);
         }
 
         const json = (await resp.json()) as BraveApiWebResponse;

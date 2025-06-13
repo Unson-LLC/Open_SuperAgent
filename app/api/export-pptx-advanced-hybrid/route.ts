@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
           </html>
         `, { waitUntil: 'networkidle0' });
         
-        await page.waitForTimeout(1000);
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
         // 1. 背景画像を生成（複雑なレイアウトやSVGを含む）
         const backgroundImage = await page.screenshot({

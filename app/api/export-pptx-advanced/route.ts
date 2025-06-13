@@ -143,7 +143,7 @@ async function captureElementsWithPuppeteer(browser: puppeteer.Browser, html: st
     `, { waitUntil: 'networkidle0' });
     
     // ページが完全に読み込まれるまで待機
-    await page.waitForTimeout(500);
+    await new Promise(resolve => setTimeout(resolve, 500));
     
     // ブラウザコンテキストで要素情報を収集
     const elementInfoList = await page.evaluate(() => {

@@ -101,7 +101,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="/">
                 <ArrowUpCircle className="h-5 w-5" />
-                <span className="text-base font-semibold">Open-SuperAgent</span>
+                <span className="text-base font-semibold">OPEN HUB AI</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

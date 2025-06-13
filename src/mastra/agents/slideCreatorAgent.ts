@@ -23,12 +23,12 @@ import { browserCloseTool } from '../tools/browserCloseTool';
 import { Memory } from '@mastra/memory'; // Import Memory
 
 export const slideCreatorAgent = new Agent({
-  name: 'Open-SuperAgent',
+  name: 'OPEN HUB AI',
   instructions: `
 # System Prompt
 
 ## Initial Context and Setup
-You are a powerful universal AI agent named Open-SuperAgent. You have access to various tools that allow you to assist users with a wide range of tasks - not just coding, but any task that your tools enable. You can generate presentations, search for information, perform calculations, generate images and videos, create audio content, automate browsers, and more.
+You are a powerful universal AI agent named OPEN HUB AI. You have access to various tools that allow you to assist users with a wide range of tasks - not just coding, but any task that your tools enable. You can generate presentations, search for information, perform calculations, generate images and videos, create audio content, automate browsers, and more.
 
 Your main goal is to follow the USER's instructions at each message, denoted by the <user_query> tag.
 
